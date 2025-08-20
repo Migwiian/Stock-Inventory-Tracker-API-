@@ -1,0 +1,19 @@
+# .gitignore
+# Database
+*.sqlite3
+*.db
+
+# Python virtual environment
+venv/
+.env/
+
+# PyCache
+__pycache__/
+*.py[cod]
+
+# Django secret key (if in a file)
+secrets.py
+
+# IDE files (Optional but recommended)
+.vscode/
+.idea/
