@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import viewsets, permissions
 from rest_framework.exceptions import PermissionDenied
-from .models import InventoryItem
-from .serializers import InventoryItemSerializer
+from .models import InventoryItem, InventoryLog
+from .serializers import InventoryItemSerializer, InventoryLogSerializer
 # Create your views here.
 class InventoryItemViewSet(viewsets.ModelViewSet):
     queryset = InventoryItem.objects.all()
@@ -42,6 +42,44 @@ class InventoryItemViewSet(viewsets.ModelViewSet):
         return queryset
     
     def perform_create(self, serializer):
-        if not self.request.user.is_authenticated:
-            raise PermissionDenied("You must be logged in to add an item.")
         serializer.save(user=self.request.user) # Associate the item with the logged-in user on creation
+        new_item = serializer.instance # Capture the newly created item
+        InventoryLog.objects.create( # This logs the creation as a restock
+            item=new_item,
+            user=self.request.user,
+            change_type= InventoryLog.CHANGE_INITIAL,
+            quantity_changed=new_item.quantity,
+            notes="Initial stock added"
+        )
+    def perform_update(self, serializer):
+        old_item = self.get_object()
+        old_quantity = old_item.quantity
+        updated_item = serializer.save()
+        quantity_delta = updated_item.quantity - old_quantity
+        if quantity_delta != 0:
+            if quantity_delta > 0:
+                change_type = InventoryLog.CHANGE_RESTOCK
+            else:
+                change_type = InventoryLog.CHANGE_SALE
+            InventoryLog.objects.create(
+                item=updated_item,
+                user=self.request.user,
+                change_type=change_type,
+                quantity_changed=quantity_delta,
+                notes=f"Quantity changed from {old_quantity} to {updated_item.quantity}"
+            )
+class InventoryLogViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = InventoryLogSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Filter logs to only those of the logged-in user, that is, the user making the request
+        queryset = InventoryLog.objects.filter(user=self.request.user)
+        item_id = self.kwargs.get('item_pk')
+        if item_id:
+            queryset = queryset.filter(item__id=item_id)
+        # Additional filtering that ensures only logs for a specific item if 'item_id' is provided as a query parameter
+        query_item_id = self.request.query_params.get('item_id')
+        if query_item_id:
+            queryset = queryset.filter(item__id=query_item_id)
+        return queryset
