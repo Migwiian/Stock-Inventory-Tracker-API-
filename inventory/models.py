@@ -16,7 +16,13 @@ class InventoryItem(models.Model):
 
 # New model for logging inventory changes
 class InventoryLog(models.Model):
+    CHANGE_RESTOCK = 'RESTOCK'
+    CHANGE_INITIAL = 'INITIAL'
+    CHANGE_SALE = 'SALE'
+    CHANGE_ADJUSTMENT = 'ADJUSTMENT'
+    CHANGE_RETURN = 'RETURN'
     CHANGE_TYPES = [
+        ('INITIAL', 'Initial Stock'),
         ('RESTOCK', 'Restock'),
         ('SALE', 'Sale'),
         ('ADJUSTMENT', 'Adjustment'),
