@@ -1,13 +1,23 @@
 from django.shortcuts import render
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, filters
 from rest_framework.exceptions import PermissionDenied
 from .models import InventoryItem, InventoryLog
 from .serializers import InventoryItemSerializer, InventoryLogSerializer
+from rest_framework.pagination import PageNumberPagination
 # Create your views here.
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
+
 class InventoryItemViewSet(viewsets.ModelViewSet):
     queryset = InventoryItem.objects.all()
     serializer_class = InventoryItemSerializer
     permission_classes = [permissions.IsAuthenticated]
+    pagination_class = StandardResultsSetPagination
+    filter_backends = [filters.OrderingFilter]
+    ordering_fields = ['name', 'quantity', 'price', 'date_added']
     
     def get_queryset(self):
         queryset = InventoryItem.objects.filter(user=self.request.user)

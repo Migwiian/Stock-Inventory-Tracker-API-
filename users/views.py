@@ -18,3 +18,11 @@ class UserDetailView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user # This will return the logged-in user's details
+
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user

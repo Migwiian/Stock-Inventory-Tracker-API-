@@ -86,8 +86,10 @@ django-csp==4.0
 django-filter==25.1
 django-taggit==6.1.0
 djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
 docstring-to-markdown @ file:///work/perseverance-python-buildout/croot/docstring-to-markdown_1698864372211/work
 docutils @ file:///croot/docutils_1744664103227/work
+drf-nested-routers==0.94.2
 et-xmlfile @ file:///work/perseverance-python-buildout/croot/et_xmlfile_1698868193149/work
 evalidate @ file:///croot/evalidate_1743605997870/work
 executing @ file:///opt/conda/conda-bld/executing_1646925071911/work
@@ -254,6 +256,7 @@ PyDispatcher @ file:///work/perseverance-python-buildout/croot/pydispatcher_1698
 pydocstyle @ file:///work/perseverance-python-buildout/croot/pydocstyle_1698865417470/work
 pyerfa @ file:///croot/pyerfa_1738082786199/work
 pyflakes @ file:///croot/pyflakes_1708962956225/work
+pygame==2.6.1
 PyGithub @ file:///croot/pygithub_1725976268771/work
 Pygments @ file:///croot/pygments_1744664109463/work
 PyJWT @ file:///croot/pyjwt_1736178889029/work
