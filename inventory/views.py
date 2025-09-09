@@ -7,11 +7,6 @@ from .filters import InventoryItemFilter
 from .permissions import IsOwner
 from rest_framework.pagination import PageNumberPagination
 
-class IsOwner(permissions.BasePermission):
-    ''' Custom permission to only allow owners of an object to access it. 
-            Assumes the model instance has an `user` attribute.'''
-    def has_object_permission(self, request, view, obj):
-        return obj.user == request.user # Only allow access if the object's user matches the request user
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 100

@@ -6,3 +6,8 @@ services:
     plan: free
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
+    # Add a new property called postdeploycommands and
+    # add the following to it:
+    postdeploycommands:
+      - python manage.py migrate
+      - python manage.py collectstatic --no-input

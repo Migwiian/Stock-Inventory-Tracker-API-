@@ -6,7 +6,7 @@ class InventoryItem(models.Model):
     name = models.CharField(max_length=100)
     quantity = models.PositiveIntegerField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.CharField(max_length=100)
+    category = models.CharField(max_length=100, db_index=True)
     date_added = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     user = models.ForeignKey('users.CustomUser', on_delete=models.CASCADE)
@@ -21,6 +21,11 @@ class InventoryLog(models.Model):
     CHANGE_SALE = 'SALE'
     CHANGE_ADJUSTMENT = 'ADJUSTMENT'
     CHANGE_RETURN = 'RETURN'
+    '''These are the types of changes that can be logged 
+    if more are needed, they can be added here
+    if a change type is added here, it should also be added to the CHANGE_TYPES list
+    if a change type is added here, it should also be handled in the views.py file
+    '''
     CHANGE_TYPES = [
         ('INITIAL', 'Initial Stock'),
         ('RESTOCK', 'Restock'),
