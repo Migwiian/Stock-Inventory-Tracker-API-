@@ -28,8 +28,12 @@ SECRET_KEY = 'django-insecure-$@j=ttn$y3rgx-x9k)s0+!ch0r(fi*k!jih4+h@94_zom*g$&=
 DEBUG = False
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = [
+    'stock-inventory-tracker.onrender.com',
+    'localhost',
+    '127.0.0.1',
+]
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost').split(',')
 
 # Application definition
 
