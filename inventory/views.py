@@ -14,6 +14,12 @@ class StandardResultsSetPagination(PageNumberPagination):
     max_page_size = 1000
 
 class InventoryItemViewSet(viewsets.ModelViewSet):
+    '''ViewSet for managing inventory items.
+    Supports listing, creating, retrieving, updating, and deleting items.
+    Only authenticated users can access this endpoint.
+    Users can only access their own items.
+    Supports filtering by name, quantity range, price range, and date added range.
+    Supports ordering by name, quantity, price, and date added.'''
     serializer_class = InventoryItemSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     pagination_class = StandardResultsSetPagination
@@ -50,7 +56,9 @@ class InventoryItemViewSet(viewsets.ModelViewSet):
         updated_item = serializer.save()
         
         quantity_delta = updated_item.quantity - old_quantity
-        
+        # Only log if there is a change in quantity
+        # Restocks are positive changes, sales are negative changes
+        # Initial changes (from 0 to initial stock) are not logged here
         if quantity_delta != 0:
             change_type = InventoryLog.CHANGE_RESTOCK if quantity_delta > 0 else InventoryLog.CHANGE_SALE
             InventoryLog.objects.create(
@@ -62,6 +70,12 @@ class InventoryItemViewSet(viewsets.ModelViewSet):
             )
 
 class InventoryLogViewSet(viewsets.ReadOnlyModelViewSet):
+    '''ViewSet for viewing inventory logs.
+    Supports listing and retrieving logs.
+    Only authenticated users can access this endpoint.
+    Users can only access their own logs.
+    Supports filtering by item and change type.
+    Supports ordering by timestamp.'''
     serializer_class = InventoryLogSerializer
     permission_classes = [permissions.IsAuthenticated, IsOwner]
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter]

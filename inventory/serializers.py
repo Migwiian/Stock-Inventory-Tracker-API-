@@ -18,24 +18,16 @@ class InventoryLogSerializer(serializers.ModelSerializer):
         model = InventoryLog
         fields = '__all__'
         read_only_fields = ['id', 'timestamp', 'user', 'item', 'change_type', 'quantity_changed']
-    def validate_quantity_changed(self, data):
-        change_type = data[change_type]
-        quantity_changed = data[quantity_changed, 0]
-        ''' Validation rules based on change type 
-         - Sales must have negative quantity_changed
-         - Restocks must have positive quantity_changed
-         - Initial stock must have positive quantity_changed
-         - Returns must have positive quantity_changed
-         - Adjustments can be positive or negative but not zero
-         '''
-        if change_type == InventoryLog.CHANGE_SALE and quantity_changed > 0:
-            raise serializers.ValidationError("For sales, quantity_changed must be negative.")
-        if change_type in InventoryLog.CHANGE_RESTOCK and quantity_changed < 0:
-            raise serializers.ValidationError("For restocks, quantity_changed must be positive.")
-        if change_type == InventoryLog.CHANGE_INITIAL and quantity_changed < 0:
-            raise serializers.ValidationError("For initial stock, quantity_changed must be positive.")
-        if change_type == InventoryLog.CHANGE_RETURN and quantity_changed < 0:
-            raise serializers.ValidationError("For returns, quantity_changed must be positive.")
-        if change_type == InventoryLog.CHANGE_ADJUSTMENT and quantity_changed == 0:
-            raise serializers.ValidationError("For adjustments, quantity_changed cannot be zero.")
-        return data
+    def validate(self, data):
+        change_type = data.get('change_type')
+        quantity_changed = data.get('quantity_changed')
+        '''In simple terms, sales reduce stock, restocks increase it, and initial stock sets it.'''
+        if change_type is not None and quantity_changed is not None:
+            if change_type == InventoryLog.CHANGE_SALE and quantity_changed > 0:
+                raise serializers.ValidationError({"quantity_changed": "For sales, quantity_changed must be negative."})
+            if change_type == InventoryLog.CHANGE_RESTOCK and quantity_changed < 0:
+                raise serializers.ValidationError({"quantity_changed": "For restocks, quantity_changed must be positive."})
+            if change_type == InventoryLog.CHANGE_INITIAL and quantity_changed < 0:
+                raise serializers.ValidationError({"quantity_changed": "For initial stock, quantity_changed must be positive."})
+        
+        return data 
